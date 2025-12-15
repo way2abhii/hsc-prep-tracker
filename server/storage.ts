@@ -5,6 +5,8 @@ import {
   type InsertTask,
   type SubjectProgress,
   type InsertSubjectProgress,
+  type ExamSettings,
+  type InsertExamSettings,
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -27,17 +29,23 @@ export interface IStorage {
   getAllSubjectProgress(): Promise<SubjectProgress[]>;
   getSubjectProgress(subjectId: string): Promise<SubjectProgress | undefined>;
   upsertSubjectProgress(progress: InsertSubjectProgress): Promise<SubjectProgress>;
+
+  // Exam settings methods
+  getExamSettings(): Promise<ExamSettings | undefined>;
+  upsertExamSettings(settings: InsertExamSettings): Promise<ExamSettings>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
   private tasks: Map<string, Task>;
   private subjectProgress: Map<string, SubjectProgress>;
+  private examSettings: ExamSettings | undefined;
 
   constructor() {
     this.users = new Map();
     this.tasks = new Map();
     this.subjectProgress = new Map();
+    this.examSettings = undefined;
     
     // Initialize with some sample tasks for demo
     this.initializeSampleData();
@@ -237,6 +245,22 @@ export class MemStorage implements IStorage {
     };
     this.subjectProgress.set(progress.subjectId, updated);
     return updated;
+  }
+
+  // Exam settings methods
+  async getExamSettings(): Promise<ExamSettings | undefined> {
+    return this.examSettings;
+  }
+
+  async upsertExamSettings(settings: InsertExamSettings): Promise<ExamSettings> {
+    const id = this.examSettings?.id ?? randomUUID();
+    this.examSettings = {
+      id,
+      examName: settings.examName,
+      examDate: settings.examDate,
+      targetScore: settings.targetScore ?? null,
+    };
+    return this.examSettings;
   }
 }
 

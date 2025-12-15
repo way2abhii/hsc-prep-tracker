@@ -10,6 +10,7 @@ import { TaskCard } from "@/components/task-card";
 import { TaskDialog } from "@/components/task-dialog";
 import { StatsCard } from "@/components/stats-card";
 import { ProgressRing } from "@/components/progress-ring";
+import { ExamCountdown } from "@/components/exam-countdown";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -257,6 +258,9 @@ export default function Dashboard() {
 
         {/* Right Sidebar */}
         <div className="space-y-6">
+          {/* Exam Countdown */}
+          <ExamCountdown />
+
           {/* Upcoming Tasks */}
           <Card>
             <CardHeader className="pb-3">

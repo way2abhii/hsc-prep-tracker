@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertTaskSchema } from "@shared/schema";
+import { insertTaskSchema, insertExamSettingsSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(
@@ -151,6 +151,33 @@ export async function registerRoutes(
       res.json(progress);
     } catch (error) {
       res.status(500).json({ error: "Failed to update progress" });
+    }
+  });
+
+  // GET exam settings
+  app.get("/api/exam-settings", async (req, res) => {
+    try {
+      const settings = await storage.getExamSettings();
+      res.json(settings ?? null);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch exam settings" });
+    }
+  });
+
+  // POST/PUT upsert exam settings
+  app.post("/api/exam-settings", async (req, res) => {
+    try {
+      const parseResult = insertExamSettingsSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        return res.status(400).json({
+          error: "Invalid exam settings data",
+          details: parseResult.error.errors,
+        });
+      }
+      const settings = await storage.upsertExamSettings(parseResult.data);
+      res.json(settings);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update exam settings" });
     }
   });
 

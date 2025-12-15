@@ -86,6 +86,25 @@ export type Task = typeof tasks.$inferSelect;
 export type InsertSubjectProgress = z.infer<typeof insertSubjectProgressSchema>;
 export type SubjectProgress = typeof subjectProgress.$inferSelect;
 
+// Exam settings table
+export const examSettings = pgTable("exam_settings", {
+  id: varchar("id").primaryKey(),
+  examName: text("exam_name").notNull(),
+  examDate: text("exam_date").notNull(), // YYYY-MM-DD format
+  targetScore: integer("target_score"),
+});
+
+export const insertExamSettingsSchema = createInsertSchema(examSettings).omit({
+  id: true,
+}).extend({
+  examName: z.string().min(1, "Exam name is required"),
+  examDate: z.string().min(1, "Exam date is required"),
+  targetScore: z.number().min(0).max(100).optional(),
+});
+
+export type InsertExamSettings = z.infer<typeof insertExamSettingsSchema>;
+export type ExamSettings = typeof examSettings.$inferSelect;
+
 // Helper types for frontend
 export interface DailySchedule {
   date: string;
